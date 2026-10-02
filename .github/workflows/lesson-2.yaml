@@ -12,31 +12,39 @@ jobs:
       run:
         working-directory: backend
     steps:
+      - name: Checkout repository
       - uses: actions/checkout@v7.0.1
+      
       - name: Disable Debug
         run: |
           sed -i 's/DEBUG = True/DEBUG = False/g' hangry_api/hangry_api/settings.py
+
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
+
       - name: '**PLACEHOLDER** Deploy to Elastic Beanstalk'
         run: echo Placeholder for Deployment
 
   unit_test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v7.0.1
-        - uses: actions/setup-python@v7
+      
+      - name : Set up Python
+        uses: actions/setup-python@v7
         with:
-          python-version: '3.13'
+          python-version: '3.8'
+
       - name: install test environment
         run: |
           python -m pip install --upgrade pip
           pip install pytest django_mock_queries six coverage
-        working-directory:
-          backend
+        
       - name: Run unit tests
         run: |
-          coverage run -m --source=./hangry_api pytest
+          coverage run --source=./hangry_api -m pytest
           coverage report
-        working-directory: backend
